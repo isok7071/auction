@@ -1,0 +1,54 @@
+{
+  "$schema": "https://modelcontextprotocol.io/schema/draft/2025-03-26/mcp.json",
+  "mcpServers": {
+    "laravel-boost": {
+      "description": "Laravel Boost MCP for this application. Prefer Boost tools over manual Laravel lookups.",
+      "command": "php",
+      "args": [
+        "artisan",
+        "boost:mcp"
+      ],
+      "env": {}
+    },
+    "fetch": {
+      "description": "Read public documentation and web pages. Uses Docker because the npm package mcp-server-fetch is a security stub and uvx is not required.",
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "mcp/fetch"
+      ],
+      "env": {}
+    },
+    "browser": {
+      "description": "Run browser-based smoke checks for the voting and statistics pages.",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@playwright/mcp@latest"
+      ],
+      "env": {}
+    },
+    "thinking": {
+      "description": "Sequential thinking for multi-step design, debugging, and trade-off analysis.",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ],
+      "env": {}
+    },
+    "memory": {
+      "description": "Durable project memory via a local knowledge graph. Store path is gitignored.",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@itseasy21/mcp-knowledge-graph"
+      ],
+      "env": {
+        "MEMORY_FILE_PATH": ".agents/mcp/cursor-memory/project.jsonl"
+      }
+    }
+  }
+}

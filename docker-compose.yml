@@ -1,0 +1,81 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    image: fordewind-app:php-8.5
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+      - laravel-framework:/var/www/html/storage/framework
+      - laravel-bootstrap-cache:/var/www/html/bootstrap/cache
+      - composer-cache:/tmp/composer-cache
+    env_file:
+      - ${APP_ENV_FILE:-.env}
+    environment:
+      COMPOSER_CACHE_DIR: /tmp/composer-cache
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - fordewind
+
+  nginx:
+    image: nginx:1.30-alpine
+    ports:
+      - "${APP_PORT:-8080}:80"
+    volumes:
+      - ./:/var/www/html:ro
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - app
+    networks:
+      - fordewind
+
+  mysql:
+    image: mysql:8.4
+    ports:
+      - "${FORWARD_DB_PORT:-3306}:3306"
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE:-fordewind}
+      MYSQL_USER: ${DB_USERNAME:-fordewind}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-fordewind}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-fordewind_root}
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u$${MYSQL_USER} -p$${MYSQL_PASSWORD} --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - fordewind
+
+  node:
+    image: node:24-bookworm-slim
+    init: true
+    working_dir: /var/www/html
+    env_file:
+      - ${APP_ENV_FILE:-.env}
+    profiles:
+      - assets
+    ports:
+      - "${VITE_PORT:-5173}:5173"
+    volumes:
+      - ./:/var/www/html
+      - npm-cache:/home/node/.npm
+    command: npm run dev
+    networks:
+      - fordewind
+
+networks:
+  fordewind:
+    driver: bridge
+
+volumes:
+  composer-cache:
+  laravel-bootstrap-cache:
+  laravel-framework:
+  mysql-data:
+  npm-cache:

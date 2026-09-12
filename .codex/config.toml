@@ -1,0 +1,30 @@
+# Project-scoped Codex MCP. Codex loads this file only when the project is trusted.
+# Keep this file portable: no tokens, cookies, wsl.exe wrappers, or host home paths.
+# Superpowers skills for this repo: .codex/skills/ -> .agents/skills/
+
+[mcp_servers.laravel-boost]
+command = "php"
+args = ["artisan", "boost:mcp"]
+
+[mcp_servers.fetch]
+command = "docker"
+args = ["run", "-i", "--rm", "mcp/fetch"]
+startup_timeout_sec = 30
+
+[mcp_servers.browser]
+command = "npx"
+args = ["-y", "@playwright/mcp@latest"]
+startup_timeout_sec = 30
+
+[mcp_servers.thinking]
+command = "npx"
+args = ["-y", "@modelcontextprotocol/server-sequential-thinking"]
+startup_timeout_sec = 30
+
+[mcp_servers.memory]
+command = "npx"
+args = ["-y", "@itseasy21/mcp-knowledge-graph"]
+startup_timeout_sec = 30
+
+[mcp_servers.memory.env]
+MEMORY_FILE_PATH = ".agents/mcp/cursor-memory/project.jsonl"
