@@ -205,6 +205,11 @@ Core product areas:
 - Use Form Requests for HTTP validation and API Resources for response shape.
 - Add `declare(strict_types=1);` to new PHP files where framework constraints allow it.
 - Declare new PHP classes `final` unless framework extension or inheritance is required.
+- Name every data-transfer object with the `Dto` suffix and keep it under the owning domain's `Data` namespace.
+- Eloquent models declare constants for their database field names and document persisted attributes in class PHPDoc. Application PHP outside migrations must use those constants instead of duplicating field-name strings.
+- Keep migrations independent from application models: schema snapshots use literal table and column names.
+- Prevent N+1 queries: eager-load relationships before collection iteration or serialization.
+- Prefer one explicit variable initialization and ordinary control flow over compact assignments or ternary side effects when readability suffers.
 
 ## Frontend Boundaries
 

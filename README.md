@@ -74,6 +74,48 @@ docker compose stop
 docker compose exec app php artisan migrate
 ```
 
+## Импорт исходных данных
+
+Полный импорт выполняется по шагам:
+
+1. Создать каталог для исходного Git-репозитория:
+
+```bash
+mkdir -p storage/app
+```
+
+2. Клонировать репозиторий с исходными данными:
+
+```bash
+git clone https://gitlab.fdw.ru/ext/test_task storage/app/import-source
+```
+
+3. Запустить приложение и MySQL:
+
+```bash
+docker compose up -d nginx
+```
+
+4. Применить миграции, если ранее не применены:
+
+```bash
+docker compose exec app php artisan migrate
+```
+
+5. Создать публичную ссылку Laravel Storage:
+
+```bash
+docker compose exec app php artisan storage:link
+```
+
+6. Запустить импорт:
+
+```bash
+docker compose exec app php artisan cars:import storage/app/import-source
+```
+
+Команда импортирует `AuctionItemId`, основные поля `Make`, `Model`, `Year` и другие нужные поля в MySQL, а фото сохраняет на public disk по пути `cars/{Image}`. Повторный запуск обновляет записи по `AuctionItemId`/имени фото и не создаёт дубликаты. Каталог `storage/app/import-source` не коммитится.
+
 ## Тесты
 
 ```bash
@@ -88,12 +130,58 @@ docker compose --profile assets config
 ```
 
 ## Структура проекта
-//TODO пока будем меняться
-- `app/` — backend Laravel.
-- `resources/` — Blade, jQuery-страница голосования и Vue-страница статистики.
-- `routes/` — web- и API-маршруты.
-- `docker/` — PHP-FPM и nginx-конфигурация.
-- `public/build/` — production-результат Vite.
+
+```text
+app/
+├── Console/Commands/          # Artisan-команды: импорт исходных данных
+├── Domain/
+│   ├── Cars/                  # Car, CarPhoto, import contracts и DTO
+│   ├── Voting/                # Vote, pair/vote contracts и DTO
+│   └── Statistics/            # statistics contracts и DTO
+├── Infrastructure/
+│   ├── Persistence/Eloquent/  # реализации repository contracts через Eloquent
+│   └── Storage/               # адаптер Laravel public filesystem
+├── Http/                      # thin controllers, Form Requests, Resources
+├── Services/                  # CarImportService, VotingPairService,
+│                              # VoteService, StatisticsService
+└── Providers/                 # DI bindings Domain -> Infrastructure
+
+database/
+├── migrations/                # cars, car_photos, votes и стандартные Laravel tables
+├── factories/                 # тестовые состояния доменных моделей
+└── seeders/                   # стандартная точка Laravel для seed-данных
+
+resources/
+├── views/                     # Blade-страницы voting и statistics
+├── js/                        # отдельные Vite entrypoints: jQuery и Vue
+└── css/                       # общие и page-specific стили
+
+routes/
+├── web.php                    # страницы и session/CSRF-защищённые JSON endpoints
+└── console.php                # консольная регистрация Laravel-команд
+
+tests/
+├── Feature/Database/          # миграции, модели и связи
+├── Feature/Console/           # импорт JSON и фотографий
+├── Feature/Http/              # endpoints, validation и Resources
+├── Unit/Services/             # pair cycle, votes и statistics
+└── Fixtures/                  # маленькие локальные import fixtures
+
+docker/                        # PHP-FPM image и nginx config
+public/build/                  # production Vite assets
+storage/app/import-source/     # локальный источник импорта, не коммитится
+```
+
+Backend boundaries:
+
+- `Domain` содержит модели, контракты и immutable DTO; бизнес-правила не зависят от Eloquent query деталей.
+- `Infrastructure` содержит Eloquent repositories и файловое хранилище; реализации подключаются через `AppServiceProvider`.
+- `Services` координируют сценарии импорта, голосования и статистики.
+- `Http` остаётся тонким: Form Request → service → API Resource/JSON.
+
+Frontend boundaries соответствуют заданию: voting page использует только jQuery/AJAX и ezPlus Tints; statistics page использует только Vue.js. Эти области не смешиваются.
+
+Планируемые backend endpoints следующих этапов: `GET /voting/models`, `GET /voting/pair`, `POST /voting/votes`, `GET /statistics`. Точные поля контрактов описаны в backend-плане [`.agents/plans/fordewind-laravel-design.md`](.agents/plans/fordewind-laravel-design.md).
 
 ## Документация
 
