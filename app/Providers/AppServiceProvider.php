@@ -6,9 +6,14 @@ namespace App\Providers;
 
 use App\Domain\Cars\Contracts\CarPhotoStorage;
 use App\Domain\Cars\Contracts\CarRepository;
+use App\Domain\Statistics\Contracts\StatisticsRepository;
+use App\Domain\Voting\Contracts\VoteRepository;
+use App\Domain\Voting\Contracts\VotingRepository;
 use App\Infrastructure\Persistence\Eloquent\EloquentCarRepository;
+use App\Infrastructure\Persistence\Eloquent\EloquentStatisticsRepository;
+use App\Infrastructure\Persistence\Eloquent\EloquentVoteRepository;
+use App\Infrastructure\Persistence\Eloquent\EloquentVotingRepository;
 use App\Infrastructure\Storage\PublicDiskCarPhotoStorage;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\ServiceProvider;
 
 final class AppServiceProvider extends ServiceProvider
@@ -20,6 +25,9 @@ final class AppServiceProvider extends ServiceProvider
     {
         $this->app->bind(CarRepository::class, EloquentCarRepository::class);
         $this->app->bind(CarPhotoStorage::class, PublicDiskCarPhotoStorage::class);
+        $this->app->bind(VotingRepository::class, EloquentVotingRepository::class);
+        $this->app->bind(VoteRepository::class, EloquentVoteRepository::class);
+        $this->app->bind(StatisticsRepository::class, EloquentStatisticsRepository::class);
     }
 
     /**

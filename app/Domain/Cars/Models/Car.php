@@ -7,10 +7,12 @@ namespace App\Domain\Cars\Models;
 use App\Domain\Voting\Models\Vote;
 use Database\Factories\CarFactory;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Support\Carbon;
 
 /**
@@ -27,6 +29,7 @@ use Illuminate\Support\Carbon;
  * @property string|null $color
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ * @property-read int $votes_count
  * @property-read Collection<int, CarPhoto> $photos
  * @property-read Collection<int, Vote> $wonVotes
  */
@@ -86,11 +89,35 @@ final class Car extends Model
         return $this->hasMany(Vote::class, Vote::FIELD_WINNER_CAR_ID);
     }
 
+    public function scopeSelectModelKey(Builder $query): void
+    {
+        $query->selectRaw($this->modelKeyExpression() . ' AS model_key');
+    }
+
+    public function scopeWhereModelKey(Builder $query, string $modelKey): void
+    {
+        $query->whereRaw($this->modelKeyExpression() . ' = ?', [$modelKey]);
+    }
+
     protected function casts(): array
     {
         return [
             self::FIELD_YEAR     => 'integer',
             self::FIELD_ODOMETER => 'integer',
         ];
+    }
+
+    private function modelKeyExpression(): string
+    {
+        $grammar = $this->getConnection()->getQueryGrammar();
+        $make = $this->wrapColumn($grammar, $this->qualifyColumn(self::FIELD_MAKE));
+        $model = $this->wrapColumn($grammar, $this->qualifyColumn(self::FIELD_MODEL));
+
+        return "CONCAT({$make}, ' ', {$model})";
+    }
+
+    private function wrapColumn(Grammar $grammar, string $column): string
+    {
+        return $grammar->wrap($column);
     }
 }
