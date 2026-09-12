@@ -58,13 +58,14 @@ services:
     working_dir: /var/www/html
     env_file:
       - ${APP_ENV_FILE:-.env}
+    environment:
+      NPM_CONFIG_CACHE: /tmp/npm-cache
     profiles:
       - assets
     ports:
       - "${VITE_PORT:-5173}:5173"
     volumes:
       - ./:/var/www/html
-      - npm-cache:/home/node/.npm
     command: npm run dev
     networks:
       - fordewind
@@ -78,4 +79,3 @@ volumes:
   laravel-bootstrap-cache:
   laravel-framework:
   mysql-data:
-  npm-cache:
