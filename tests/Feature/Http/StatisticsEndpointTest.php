@@ -27,7 +27,7 @@ final class StatisticsEndpointTest extends TestCase
             Vote::FIELD_WINNER_CAR_ID   => $car->getKey(),
         ]);
 
-        $response = $this->getJson('/statistics?model=FORD%20MUSTANG&year_from=2005&year_to=2005');
+        $response = $this->getJson('/statistics/data?model=FORD%20MUSTANG&year_from=2005&year_to=2005');
 
         $response
             ->assertOk()
@@ -40,7 +40,7 @@ final class StatisticsEndpointTest extends TestCase
 
     public function test_it_rejects_an_inverted_year_range(): void
     {
-        $this->getJson('/statistics?year_from=2010&year_to=2005')
+        $this->getJson('/statistics/data?year_from=2010&year_to=2005')
             ->assertUnprocessable()
             ->assertJsonValidationErrors(['year_to']);
     }
@@ -50,7 +50,7 @@ final class StatisticsEndpointTest extends TestCase
         $car = Car::factory()->create();
         CarPhoto::factory()->for($car)->create();
 
-        $this->getJson('/statistics')
+        $this->getJson('/statistics/data')
             ->assertOk()
             ->assertJsonPath('data.0.id', $car->getKey())
             ->assertJsonPath('data.0.votes_count', 0)
@@ -59,7 +59,7 @@ final class StatisticsEndpointTest extends TestCase
 
     public function test_it_returns_an_empty_collection_with_zero_total_for_non_matching_filters(): void
     {
-        $this->getJson('/statistics?model=NOT%20IMPORTED')
+        $this->getJson('/statistics/data?model=NOT%20IMPORTED')
             ->assertOk()
             ->assertJsonPath('data', [])
             ->assertJsonPath('meta.total_votes', 0);

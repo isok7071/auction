@@ -36,7 +36,7 @@ final class VotingPairServiceTest extends TestCase
         $thirdIds = [$third->left->getKey(), $third->right->getKey()];
 
         $firstCycleIds = [...$firstIds, ...$secondIds];
-        $unseenIds = array_values(array_diff($photos->modelKeys()->all(), $firstCycleIds));
+        $unseenIds = array_values(array_diff($photos->modelKeys(), $firstCycleIds));
 
         $this->assertCount(2, array_unique($firstIds));
         $this->assertCount(2, array_unique($secondIds));

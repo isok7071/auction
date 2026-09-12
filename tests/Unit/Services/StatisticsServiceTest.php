@@ -51,10 +51,14 @@ final class StatisticsServiceTest extends TestCase
     private function addWonVotes(Car $winnerCar, int $count): void
     {
         $winnerPhoto = $winnerCar->photos()->firstOrFail();
+        $loserCar = $this->carWithPhoto('TOYOTA', 'CAMRY', 1990);
+        $loserPhoto = $loserCar->photos()->firstOrFail();
 
         Vote::factory()->count($count)->create([
             Vote::FIELD_WINNER_PHOTO_ID => $winnerPhoto->getKey(),
             Vote::FIELD_WINNER_CAR_ID   => $winnerCar->getKey(),
+            Vote::FIELD_LOSER_PHOTO_ID  => $loserPhoto->getKey(),
+            Vote::FIELD_LOSER_CAR_ID    => $loserCar->getKey(),
         ]);
     }
 }
