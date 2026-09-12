@@ -9,5 +9,7 @@ use Illuminate\Support\Collection;
 
 interface StatisticsRepository
 {
+    public function modelOptions(): Collection;
+
     public function find(StatisticsFiltersDto $filters): Collection;
 }

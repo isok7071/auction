@@ -12,6 +12,16 @@ use Illuminate\Support\Collection;
 
 final class EloquentStatisticsRepository implements StatisticsRepository
 {
+    public function modelOptions(): Collection
+    {
+        return Car::query()
+            ->selectModelKey()
+            ->groupBy(Car::FIELD_MAKE, Car::FIELD_MODEL)
+            ->orderBy(Car::FIELD_MAKE)
+            ->orderBy(Car::FIELD_MODEL)
+            ->get();
+    }
+
     public function find(StatisticsFiltersDto $filters): Collection
     {
         $query = Car::query()

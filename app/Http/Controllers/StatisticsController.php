@@ -6,10 +6,17 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\IndexStatisticsRequest;
 use App\Http\Resources\StatisticsCollection;
+use App\Http\Resources\StatisticsModelResource;
 use App\Services\StatisticsService;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 final class StatisticsController extends Controller
 {
+    public function models(StatisticsService $service): AnonymousResourceCollection
+    {
+        return StatisticsModelResource::collection($service->models());
+    }
+
     public function index(
         IndexStatisticsRequest $request,
         StatisticsService $service
