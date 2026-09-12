@@ -6,13 +6,13 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
-use Illuminate\Support\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 final class StatisticsCollection extends ResourceCollection
 {
     public $collects = StatisticsCarResource::class;
 
-    public function __construct(Collection $resource, private int $totalVotes)
+    public function __construct(LengthAwarePaginator $resource, private int $totalVotes)
     {
         parent::__construct($resource);
     }

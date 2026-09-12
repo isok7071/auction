@@ -26,6 +26,8 @@ final class StatisticsController extends Controller
             $data['model'] ?? null,
             isset($data['year_from']) ? (int) $data['year_from'] : null,
             isset($data['year_to']) ? (int) $data['year_to'] : null,
+            (int) ($data['page'] ?? 1),
+            (int) ($data['per_page'] ?? 24),
         );
 
         return new StatisticsCollection(

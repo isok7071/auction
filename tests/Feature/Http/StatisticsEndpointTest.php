@@ -64,4 +64,25 @@ final class StatisticsEndpointTest extends TestCase
             ->assertJsonPath('data', [])
             ->assertJsonPath('meta.total_votes', 0);
     }
+
+    public function test_it_paginates_statistics_results(): void
+    {
+        Car::factory()->count(25)->create();
+
+        $this->getJson('/statistics/data?page=2&per_page=10')
+            ->assertOk()
+            ->assertJsonCount(10, 'data')
+            ->assertJsonPath('meta.current_page', 2)
+            ->assertJsonPath('meta.last_page', 3)
+            ->assertJsonPath('meta.per_page', 10)
+            ->assertJsonPath('meta.total', 25)
+            ->assertJsonPath('meta.total_votes', 0);
+    }
+
+    public function test_it_rejects_an_oversized_statistics_page(): void
+    {
+        $this->getJson('/statistics/data?per_page=101')
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['per_page']);
+    }
 }

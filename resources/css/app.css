@@ -15,3 +15,12 @@
 .zoomContainer {
     z-index: 10;
 }
+
+.zoomContainer img {
+    max-width: none !important;
+    object-fit: initial !important;
+}
+
+.zoomContainer .zoomWindow {
+    background-repeat: no-repeat;
+}

@@ -2,6 +2,7 @@
 import { onMounted } from 'vue';
 import StatisticsFeedback from './components/StatisticsFeedback.vue';
 import StatisticsFilters from './components/StatisticsFilters.vue';
+import StatisticsPagination from './components/StatisticsPagination.vue';
 import StatisticsResults from './components/StatisticsResults.vue';
 import { useStatistics } from './composables/useStatistics';
 
@@ -27,6 +28,7 @@ const {
     load,
     loadResults,
     models,
+    pagination,
     resetFilters,
     totalVotes,
 } = useStatistics(props);
@@ -68,6 +70,13 @@ onMounted(load);
             :cars="cars"
             :total-votes="totalVotes"
             :is-loading="isLoadingResults"
+        />
+
+        <StatisticsPagination
+            v-if="hasLoaded"
+            :pagination="pagination"
+            :is-loading="isLoadingResults"
+            @change="loadResults"
         />
     </div>
 </template>

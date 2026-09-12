@@ -35,8 +35,11 @@ export async function fetchStatisticsModels(url) {
     return payload.data;
 }
 
-export async function fetchStatistics(url, filters, signal) {
-    const params = new URLSearchParams();
+export async function fetchStatistics(url, filters, page, perPage, signal) {
+    const params = new URLSearchParams({
+        page: String(page),
+        per_page: String(perPage),
+    });
     const model = filters.model.trim();
 
     if (model) {

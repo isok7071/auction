@@ -37,7 +37,7 @@
                                  hidden>
                         </div>
                         <div class="p-4">
-                            <button class="w-full rounded-lg bg-sky-700 px-4 py-3 font-semibold text-white transition hover:bg-sky-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700 disabled:cursor-not-allowed disabled:bg-slate-300"
+                            <button class="w-full cursor-pointer rounded-lg bg-sky-700 px-4 py-3 font-semibold text-white transition hover:bg-sky-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700 disabled:cursor-not-allowed disabled:bg-slate-300"
                                     type="button"
                                     data-side="{{ $side }}"
                                     disabled>

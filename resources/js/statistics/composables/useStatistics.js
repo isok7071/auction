@@ -10,6 +10,12 @@ export function useStatistics({ statisticsApi, modelsApi }) {
         yearFrom: '',
         yearTo: '',
     });
+    const pagination = reactive({
+        currentPage: 1,
+        lastPage: 1,
+        perPage: 24,
+        total: 0,
+    });
     const isLoadingModels = ref(false);
     const isLoadingResults = ref(false);
     const error = ref('');
@@ -35,7 +41,7 @@ export function useStatistics({ statisticsApi, modelsApi }) {
         return true;
     }
 
-    async function loadResults() {
+    async function loadResults(page = 1) {
         if (!statisticsApi) {
             error.value = 'Не настроен адрес статистики.';
 
@@ -53,7 +59,13 @@ export function useStatistics({ statisticsApi, modelsApi }) {
         isLoadingResults.value = true;
 
         try {
-            const payload = await fetchStatistics(statisticsApi, filters, resultsController.signal);
+            const payload = await fetchStatistics(
+                statisticsApi,
+                filters,
+                page,
+                pagination.perPage,
+                resultsController.signal,
+            );
 
             if (sequence !== requestSequence) {
                 return;
@@ -61,6 +73,10 @@ export function useStatistics({ statisticsApi, modelsApi }) {
 
             cars.value = payload.data;
             totalVotes.value = payload.meta.total_votes;
+            pagination.currentPage = payload.meta.current_page;
+            pagination.lastPage = payload.meta.last_page;
+            pagination.perPage = payload.meta.per_page;
+            pagination.total = payload.meta.total;
             hasLoaded.value = true;
         } catch (requestError) {
             if (requestError.name !== 'AbortError' && sequence === requestSequence) {
@@ -73,11 +89,11 @@ export function useStatistics({ statisticsApi, modelsApi }) {
         }
     }
 
-    async function load() {
+    async function loadModels() {
         if (!modelsApi) {
             error.value = 'Не настроен адрес списка моделей.';
 
-            return;
+            return false;
         }
 
         isLoadingModels.value = true;
@@ -85,11 +101,20 @@ export function useStatistics({ statisticsApi, modelsApi }) {
 
         try {
             models.value = await fetchStatisticsModels(modelsApi);
-            await loadResults();
+
+            return true;
         } catch (requestError) {
             error.value = requestError.message;
+
+            return false;
         } finally {
             isLoadingModels.value = false;
+        }
+    }
+
+    async function load() {
+        if (await loadModels()) {
+            await loadResults();
         }
     }
 
@@ -97,14 +122,16 @@ export function useStatistics({ statisticsApi, modelsApi }) {
         filters.model = '';
         filters.yearFrom = '';
         filters.yearTo = '';
-        loadResults();
+        loadResults(1);
     }
 
     function dismissError() {
         error.value = '';
     }
 
-    onBeforeUnmount(() => resultsController?.abort());
+    onBeforeUnmount(() => {
+        resultsController?.abort();
+    });
 
     return {
         cars,
@@ -115,8 +142,10 @@ export function useStatistics({ statisticsApi, modelsApi }) {
         isLoadingModels,
         isLoadingResults,
         load,
+        loadModels,
         loadResults,
         models,
+        pagination,
         resetFilters,
         totalVotes,
     };

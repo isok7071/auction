@@ -38,6 +38,8 @@ final class IndexStatisticsRequest extends FormRequest
                 'between:1886,' . $currentYear,
                 'gte:year_from',
             ],
+            'page'      => ['nullable', 'integer', 'min:1'],
+            'per_page'  => ['nullable', 'integer', 'between:1,100'],
         ];
     }
 }

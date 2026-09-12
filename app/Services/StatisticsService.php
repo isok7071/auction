@@ -18,10 +18,22 @@ final class StatisticsService
         return $this->statistics->modelOptions();
     }
 
-    public function forFilters(?string $modelKey, ?int $yearFrom, ?int $yearTo): StatisticsResultDto
-    {
-        $cars = $this->statistics->find(new StatisticsFiltersDto($modelKey, $yearFrom, $yearTo));
+    public function forFilters(
+        ?string $modelKey,
+        ?int $yearFrom,
+        ?int $yearTo,
+        int $page = 1,
+        int $perPage = 24,
+    ): StatisticsResultDto {
+        $filters = new StatisticsFiltersDto($modelKey, $yearFrom, $yearTo);
 
-        return new StatisticsResultDto($cars, (int) $cars->sum('votes_count'));
+        return new StatisticsResultDto(
+            $this->statistics->paginate(
+                $filters,
+                $page,
+                $perPage
+            ),
+            $this->statistics->totalVotes($filters),
+        );
     }
 }

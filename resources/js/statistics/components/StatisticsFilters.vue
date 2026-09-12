@@ -36,6 +36,14 @@ const emit = defineEmits([
 
 const currentYear = new Date().getFullYear();
 
+function dateValue(year) {
+    return year ? `${year}-01-01` : '';
+}
+
+function updateYear(event, eventName) {
+    emit(`update:${eventName}`, event.target.value.slice(0, 4));
+}
+
 function submit() {
     emit('submit');
 }
@@ -44,11 +52,11 @@ function submit() {
 <template>
     <form class="rounded-2xl bg-white p-5 shadow-sm sm:p-6" @submit.prevent="submit">
         <div class="grid gap-4 sm:grid-cols-3">
-            <label class="grid gap-2 text-sm font-semibold text-slate-800">
+            <label class="grid min-w-0 gap-2 text-sm font-semibold text-slate-800">
                 Модель
                 <select
                     :value="props.model"
-                    class="rounded-lg border-slate-300 bg-white text-slate-950 shadow-sm focus:border-sky-600 focus:ring-sky-600"
+                    class="min-w-0 rounded-lg border-slate-300 bg-white text-slate-950 shadow-sm focus:border-sky-600 focus:ring-sky-600"
                     :disabled="props.isLoadingModels || props.isLoadingResults"
                     @change="emit('update:model', $event.target.value)"
                 >
@@ -59,45 +67,43 @@ function submit() {
                 </select>
             </label>
 
-            <label class="grid gap-2 text-sm font-semibold text-slate-800">
+            <label class="grid min-w-0 gap-2 text-sm font-semibold text-slate-800">
                 Год от
                 <input
-                    :value="props.yearFrom"
-                    class="rounded-lg border-slate-300 text-slate-950 shadow-sm focus:border-sky-600 focus:ring-sky-600"
-                    type="number"
-                    min="1886"
-                    :max="currentYear"
-                    inputmode="numeric"
+                    class="min-w-0 rounded-lg border-slate-300 text-slate-950 shadow-sm focus:border-sky-600 focus:ring-sky-600"
+                    type="date"
+                    min="1886-01-01"
+                    :max="`${currentYear}-12-31`"
+                    :value="dateValue(props.yearFrom)"
                     :disabled="props.isLoadingResults"
-                    @input="emit('update:yearFrom', $event.target.value)"
+                    @input="updateYear($event, 'yearFrom')"
                 >
             </label>
 
-            <label class="grid gap-2 text-sm font-semibold text-slate-800">
+            <label class="grid min-w-0 gap-2 text-sm font-semibold text-slate-800">
                 Год до
                 <input
-                    :value="props.yearTo"
-                    class="rounded-lg border-slate-300 text-slate-950 shadow-sm focus:border-sky-600 focus:ring-sky-600"
-                    type="number"
-                    min="1886"
-                    :max="currentYear"
-                    inputmode="numeric"
+                    class="min-w-0 rounded-lg border-slate-300 text-slate-950 shadow-sm focus:border-sky-600 focus:ring-sky-600"
+                    type="date"
+                    min="1886-01-01"
+                    :max="`${currentYear}-12-31`"
+                    :value="dateValue(props.yearTo)"
                     :disabled="props.isLoadingResults"
-                    @input="emit('update:yearTo', $event.target.value)"
+                    @input="updateYear($event, 'yearTo')"
                 >
             </label>
         </div>
 
         <div class="mt-5 flex flex-wrap gap-3">
             <button
-                class="rounded-lg bg-sky-700 px-4 py-2.5 font-semibold text-white hover:bg-sky-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700 disabled:cursor-not-allowed disabled:bg-slate-300"
+                class="cursor-pointer rounded-lg bg-sky-700 px-4 py-2.5 font-semibold text-white hover:bg-sky-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700 disabled:cursor-not-allowed disabled:bg-slate-300"
                 type="submit"
                 :disabled="props.isLoadingModels || props.isLoadingResults"
             >
                 Применить
             </button>
             <button
-                class="rounded-lg border border-slate-300 px-4 py-2.5 font-semibold text-slate-800 hover:bg-slate-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-700 disabled:cursor-not-allowed"
+                class="cursor-pointer rounded-lg border border-slate-300 px-4 py-2.5 font-semibold text-slate-800 hover:bg-slate-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-700 disabled:cursor-not-allowed"
                 type="button"
                 :disabled="props.isLoadingResults"
                 @click="emit('reset')"

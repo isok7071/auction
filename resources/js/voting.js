@@ -57,6 +57,7 @@ $(function () {
             const zoom = $.data($image[0], 'ezPlus');
 
             zoom?.destroy();
+            $(`#${$image.attr('id')}-zoomContainer`).remove();
             $image.removeAttr('src').attr('alt', '').prop('hidden', true);
         });
     };
@@ -68,7 +69,9 @@ $(function () {
             return;
         }
 
-        Object.values($images).forEach(($image) => {
+        const useContainedLens = window.matchMedia('(max-width: 767px)').matches;
+
+        Object.entries($images).forEach(([side, $image]) => {
             if (!$image.attr('src')) {
                 return;
             }
@@ -77,6 +80,17 @@ $(function () {
                 tint: true,
                 tintColour: '#0ea5e9',
                 tintOpacity: 0.35,
+                ...(useContainedLens
+                    ? {
+                        zoomType: 'lens',
+                        lensShape: 'square',
+                        lensSize: 180,
+                        containLensZoom: true,
+                    }
+                    : {
+                        zoomWindowPosition: side === 'left' ? 1 : 11,
+                        zoomWindowOffsetX: 12,
+                    }),
                 zoomWindowWidth: 320,
                 zoomWindowHeight: 240,
                 zoomWindowFadeIn: 150,
@@ -89,13 +103,22 @@ $(function () {
         currentPair = pair;
 
         clearImages();
+        let loadedImages = 0;
+
+        const initializeZoomWhenReady = () => {
+            loadedImages += 1;
+
+            if (loadedImages === Object.keys($images).length) {
+                enableZoom();
+            }
+        };
 
         for (const side of ['left', 'right']) {
             const photo = pair[side];
             const $image = $images[side];
 
             $image
-                .one('load', enableZoom)
+                .one('load', initializeZoomWhenReady)
                 .attr('src', photo.url)
                 .attr('alt', `${pair.model}: ${side === 'left' ? 'левая' : 'правая'} фотография`)
                 .prop('hidden', false);
