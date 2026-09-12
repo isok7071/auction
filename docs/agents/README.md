@@ -6,7 +6,7 @@ Human-facing product docs are Russian (`README.md` and the design spec). This di
 
 | File | Purpose |
 | --- | --- |
-| `HANDOFF.md` | Current stage, next step, files, commands, verification, risks. Harness and Docker are done; next vendor starts data model and import. |
+| `HANDOFF.md` | Current stage, next step, files, commands, verification, and risks. Read it before any implementation work. |
 | `TOOLING.md` | Canonical MCP and skills inventory for this project. |
 | `DECISIONS.md` | Architecture and tooling decisions with rationale. |
 | `AI_WORKFLOW.md` | Skills, MCP/tools, subagents, prompts, and verification evidence. |

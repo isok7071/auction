@@ -56,8 +56,10 @@ $(function () {
         Object.values($images).forEach(($image) => {
             const zoom = $.data($image[0], 'ezPlus');
 
+            $image.off('.votingPair').off('.ezpspace').off('mouseenter mouseleave');
             zoom?.destroy();
             $(`#${$image.attr('id')}-zoomContainer`).remove();
+            $image.removeData('ezPlus');
             $image.removeAttr('src').attr('alt', '').prop('hidden', true);
         });
     };
@@ -69,7 +71,7 @@ $(function () {
             return;
         }
 
-        const useContainedLens = window.matchMedia('(max-width: 767px)').matches;
+        const useContainedLens = window.matchMedia('(max-width: 1023px)').matches;
 
         Object.entries($images).forEach(([side, $image]) => {
             if (!$image.attr('src')) {
@@ -104,6 +106,7 @@ $(function () {
 
         clearImages();
         let loadedImages = 0;
+        let failedToLoad = false;
 
         const initializeZoomWhenReady = () => {
             loadedImages += 1;
@@ -113,12 +116,24 @@ $(function () {
             }
         };
 
+        const showPhotoLoadingError = () => {
+            if (failedToLoad) {
+                return;
+            }
+
+            failedToLoad = true;
+            currentPair = null;
+            clearImages();
+            setState('error', 'Не удалось загрузить одну из фотографий. Выберите модель и повторите попытку.');
+        };
+
         for (const side of ['left', 'right']) {
             const photo = pair[side];
             const $image = $images[side];
 
             $image
-                .one('load', initializeZoomWhenReady)
+                .one('load.votingPair', initializeZoomWhenReady)
+                .one('error.votingPair', showPhotoLoadingError)
                 .attr('src', photo.url)
                 .attr('alt', `${pair.model}: ${side === 'left' ? 'левая' : 'правая'} фотография`)
                 .prop('hidden', false);

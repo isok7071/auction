@@ -26,7 +26,7 @@
                    aria-live="polite">Загружаем доступные модели.</p>
             </div>
 
-            <div class="mt-6 grid gap-6 md:grid-cols-2"
+            <div class="mt-6 grid gap-6 lg:grid-cols-2"
                  aria-live="polite">
                 @foreach (['left' => 'Левая нравится больше', 'right' => 'Правая нравится больше'] as $side => $label)
                     <article class="overflow-hidden rounded-2xl bg-white shadow-sm">

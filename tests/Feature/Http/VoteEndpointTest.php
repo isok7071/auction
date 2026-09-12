@@ -26,7 +26,7 @@ final class VoteEndpointTest extends TestCase
     public function test_it_accepts_a_vote_after_fetching_a_pair(): void
     {
         $car = Car::factory()->create([
-            Car::FIELD_MAKE  => 'FORD',
+            Car::FIELD_MAKE => 'FORD',
             Car::FIELD_MODEL => 'MUSTANG',
         ]);
         CarPhoto::factory()->count(2)->for($car)->create();
@@ -36,9 +36,9 @@ final class VoteEndpointTest extends TestCase
         $right = $pairResponse->json('data.right.id');
 
         $this->postVote([
-            'model'           => 'FORD MUSTANG',
+            'model' => 'FORD MUSTANG',
             'winner_photo_id' => $left,
-            'loser_photo_id'  => $right,
+            'loser_photo_id' => $right,
         ])->assertCreated()
             ->assertJsonStructure(['data' => ['id', 'winner_photo_id', 'loser_photo_id']]);
     }
@@ -46,15 +46,15 @@ final class VoteEndpointTest extends TestCase
     public function test_it_rejects_a_repeated_submission_of_an_consumed_pair(): void
     {
         $car = Car::factory()->create([
-            Car::FIELD_MAKE  => 'FORD',
+            Car::FIELD_MAKE => 'FORD',
             Car::FIELD_MODEL => 'MUSTANG',
         ]);
         CarPhoto::factory()->count(2)->for($car)->create();
         $pair = $this->getJson('/voting/pair?model=FORD%20MUSTANG')->json('data');
         $payload = [
-            'model'           => 'FORD MUSTANG',
+            'model' => 'FORD MUSTANG',
             'winner_photo_id' => $pair['left']['id'],
-            'loser_photo_id'  => $pair['right']['id'],
+            'loser_photo_id' => $pair['right']['id'],
         ];
 
         $this->postVote($payload)->assertCreated();
@@ -66,16 +66,16 @@ final class VoteEndpointTest extends TestCase
     public function test_it_rejects_duplicate_or_tampered_photo_ids(): void
     {
         $car = Car::factory()->create([
-            Car::FIELD_MAKE  => 'FORD',
+            Car::FIELD_MAKE => 'FORD',
             Car::FIELD_MODEL => 'MUSTANG',
         ]);
         $photos = CarPhoto::factory()->count(3)->for($car)->create();
         $pair = $this->getJson('/voting/pair?model=FORD%20MUSTANG')->json('data');
 
         $this->postVote([
-            'model'           => 'FORD MUSTANG',
+            'model' => 'FORD MUSTANG',
             'winner_photo_id' => $pair['left']['id'],
-            'loser_photo_id'  => $pair['left']['id'],
+            'loser_photo_id' => $pair['left']['id'],
         ])->assertUnprocessable()
             ->assertJsonValidationErrors(['loser_photo_id']);
 
@@ -84,7 +84,7 @@ final class VoteEndpointTest extends TestCase
         foreach ($photos as $photo) {
             $photoId = $photo->getKey();
 
-            if (!in_array($photoId, [$pair['left']['id'], $pair['right']['id']], true)) {
+            if (! in_array($photoId, [$pair['left']['id'], $pair['right']['id']], true)) {
                 $unissuedPhotoId = $photoId;
 
                 break;
@@ -94,12 +94,21 @@ final class VoteEndpointTest extends TestCase
         $this->assertNotNull($unissuedPhotoId);
 
         $this->postVote([
-            'model'           => 'FORD MUSTANG',
+            'model' => 'FORD MUSTANG',
             'winner_photo_id' => $pair['left']['id'],
-            'loser_photo_id'  => $unissuedPhotoId,
+            'loser_photo_id' => $unissuedPhotoId,
         ])->assertUnprocessable();
 
         $this->assertDatabaseCount('votes', 0);
+    }
+
+    public function test_it_rate_limits_vote_submissions_per_ip_address(): void
+    {
+        for ($attempt = 1; $attempt <= 30; $attempt++) {
+            $this->postVote([])->assertUnprocessable();
+        }
+
+        $this->postVote([])->assertTooManyRequests();
     }
 
     /**

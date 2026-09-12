@@ -28,7 +28,11 @@ final class CarImportService
         foreach (glob($sourcePath . DIRECTORY_SEPARATOR . '*.json') ?: [] as $jsonPath) {
             try {
                 /** @var array<string, mixed> $payload */
-                $payload = json_decode((string) file_get_contents($jsonPath), true, flags: JSON_THROW_ON_ERROR);
+                $payload = json_decode(
+                    (string) file_get_contents($jsonPath),
+                    true,
+                    flags: JSON_THROW_ON_ERROR
+                );
             } catch (JsonException $exception) {
                 throw new RuntimeException(
                     "Invalid JSON file: {$jsonPath}",

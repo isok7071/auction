@@ -137,3 +137,83 @@ This file records architecture and tooling decisions for the Fordewind Laravel a
 **Rationale:** PHP 8.5 is the current stable actively supported PHP branch and Laravel 13 supports it. Node 24 is the current LTS line; Node 26 is Current rather than LTS and is not the production default. MySQL 8.4 is the LTS line and nginx 1.30 is the stable line. PHP build dependencies are removed in the same Alpine layer, reducing the app image to about 138 MB. Node uses Debian slim because the repository's host-installed native frontend bindings target glibc and fail inside Alpine/musl.
 
 **Consequence:** Runtime services are `app`, `nginx`, and `mysql`; the `node` service is available under the `assets` profile. `app` and `node` consume `${APP_ENV_FILE:-.env}`. Vite HMR is exposed directly on port 5173, while nginx serves Laravel and production assets from `public/build`.
+
+## D018 - Backend Contract Is Based On The Inspected Local Source Snapshot
+
+**Decision:** The backend execution plan imports a local source directory only, identifies cars by `AuctionItemId`, groups selectable models by exact `Make + ' ' + Model`, copies images to the public disk, keeps a per-session/model shuffled deck, and counts received votes from `winner_car_id`.
+
+**Rationale:** The inspected source snapshot contains 1,497 JSON and 1,497 matching JPG files; its JSON has both `Make` and `Model`, so a single bare model field is not a stable selector. A local command satisfies `Task.md` without an unneeded remote-fetch credential/update mechanism. Web JSON routes preserve the existing database Laravel session and CSRF protection.
+
+**Consequence:** Execute `.agents/plans/fordewind-laravel-design.md` before frontend work. The later jQuery/Vue implementations consume its four endpoint contracts rather than inventing separate state or aggregate rules.
+
+## D019 - Preserve The Agreed Domain, Infrastructure, And Repository Boundaries
+
+**Decision:** The Fordewind backend uses `app/Domain` for models, contracts, and immutable DTOs; `app/Infrastructure` for Eloquent repositories and storage adapters; and `app/Services` for application orchestration. `AppServiceProvider` binds each domain contract to its infrastructure implementation.
+
+**Rationale:** This is the architecture agreed for the project. Laravel's direct Eloquent use would also be valid in a smaller application, but it would erase the agreed boundaries and make imports, aggregate queries, and filesystem persistence harder to replace or isolate in tests.
+
+**Consequence:** D016's preference for avoiding premature Domain/Infrastructure folders is superseded for this backend scope. DTOs are used for compound values crossing layers, not for individual scalar parameters or to duplicate Eloquent models.
+
+## D020 - Keep Cars Schema Normalized Without Raw Source Payload
+
+**Decision:** `cars` stores normalized fields required by filtering, display, identity, and voting. It does not store the complete source JSON payload.
+
+**Rationale:** `Task.md` requires importing and displaying needed source data, not preserving an opaque copy. A raw JSON column would increase row size and duplicate data without a current consumer. The schema has not been released, so correcting its initial migration keeps fresh installations clean.
+
+**Consequence:** Import DTO maps only normalized fields. Because the schema has not been released, the initial `cars` migration was corrected directly and the local database rebuilt with `migrate:fresh`. Future source fields require an explicit schema decision and migration.
+
+## D021 - Backend Naming, Model Metadata, And Query Safety
+
+**Decision:** Cross-layer data objects use the `Dto` suffix. Eloquent models expose constants for persisted field names and document attributes in class PHPDoc. Application PHP uses those constants; migrations remain literal schema snapshots. Lazy loading is prevented outside production.
+
+**Rationale:** Explicit DTO naming makes layer boundaries visible. Central field names reduce typo-prone duplication in repositories, factories, and tests. Lazy-loading prevention catches N+1 regressions during development and testing.
+
+**Consequence:** New repositories keep Eloquent details under `app/Infrastructure/Persistence/Eloquent`, storage adapters under `app/Infrastructure/Storage`, contracts and DTOs under their owning `app/Domain`, and orchestration under `app/Services`. Relationships needed by collections or resources must be eager-loaded.
+
+## D022 - Preserve Every Photo At The Voting-Cycle Boundary
+
+**Decision:** The session deck retains a single final unseen photo when a model has an odd number of photos. Its boundary pair combines that final photo with one freshly shuffled repeat, then stores the remaining new deck. The pair and vote routes use Laravel session blocking with `->block(10, 10)`.
+
+**Rationale:** Dropping the final singleton would let a cycle reset without showing every available photo, which contradicts the product rule. Session route blocking serializes rapid same-browser AJAX calls before they consume or clear the pending pair.
+
+**Consequence:** `VotingPairService` owns `clearPendingPair()` in addition to pair issuance. `VoteService` clears the pending pair only after its repository transaction creates the vote. Tests cover the five-photo boundary and sequential duplicate vote rejection.
+
+## D023 - Session-Protected Voting API And Model-Key Scopes
+
+**Decision:** Voting uses named `web.php` JSON routes, Laravel session blocking on pair/vote mutations, and a pending-pair state keyed by the selected `Make + Model` value. Statistics uses `winner_car_id` as the received-vote aggregate and returns the total once under response `meta`. `Car` owns MySQL model-key query scopes.
+
+**Rationale:** The client must not be able to vote for arbitrary photos or consume concurrent pairs. The delivery runtime and verification environment are MySQL, so the model-key expression follows MySQL semantics.
+
+**Consequence:** `VotingPairService` and `VoteService` remain server-side authorities for a pair and vote. `EloquentVotingRepository` counts joined `car_photos` across each grouped model, while `EloquentVotingRepository` and `EloquentStatisticsRepository` apply `Car::selectModelKey()` and `Car::whereModelKey()` instead of duplicating the MySQL `CONCAT()` expression. Frontend code consumes four stable endpoints without embedding selection or aggregation rules.
+
+## D024 - Separate Human Pages From Statistics Data Routes
+
+**Decision:** `/statistics` renders the Blade page, while `/statistics/data` returns filtered rows and `/statistics/models` returns every model available to the statistics filter. The voting selector remains a separate `/voting/models` contract.
+
+**Rationale:** One URL cannot reliably serve both the human page and its JSON payload. Voting requires at least two photos, while statistics must include models and cars even when they cannot produce a voting pair.
+
+**Consequence:** Blade only supplies relative endpoint URLs to the frontend mount. Vue and jQuery request JSON explicitly with `Accept: application/json`; neither UI duplicates backend selection rules.
+
+## D025 - Vue Statistics Uses Composition API And SFC Boundaries
+
+**Decision:** The statistics frontend uses Vue 3 `<script setup>` single-file components. `statistics.js` only mounts `StatisticsApp.vue`; HTTP parsing lives in `statistics/api`, request and filter state in `statistics/composables`, and focused presentation components in `statistics/components`.
+
+**Rationale:** Keeping the template, transport, concurrency handling, formatting, and all state in one entry file makes changes hard to review and test. These boundaries keep orchestration visible without introducing a UI framework or state-store dependency.
+
+**Consequence:** New statistics behavior extends the relevant component, composable, or API module. jQuery and ezPlus remain isolated to the voting entrypoint.
+
+## D026 - Paginated Statistics Results And Complete Model Selector
+
+**Decision:** `/statistics/models` returns every distinct model for a native Vue selector. `/statistics/data` paginates filtered cars on the server with 24 rows by default and a validated maximum of 100, while `meta.total_votes` covers the complete filtered result set.
+
+**Rationale:** The product requirement calls for model selection, and the imported dataset has only a modest number of distinct model keys. The actual performance problem was rendering all 1,497 car results and photos at once, so pagination belongs on the result collection rather than the selector.
+
+**Consequence:** The selector remains complete and predictable. Vue requests one result page at a time, page changes do not navigate the browser, and the API exposes standard pagination metadata in addition to the filtered vote total.
+
+## D027 - Responsive Zoom And Vote Rate Limit
+
+**Decision:** Voting renders its two-card layout and external ezPlus zoom only from the `lg` breakpoint. Below it, a contained lens keeps the tint interaction inside the photo. Vote submission is limited to 30 requests per minute per IP address.
+
+**Rationale:** A two-column layout combined with an external zoom window at tablet widths can exceed the viewport. The voting endpoint is intentionally public, but an unbounded write endpoint permits avoidable automated vote inflation.
+
+**Consequence:** The jQuery page remains the sole owner of ezPlus and removes its handlers before a new pair is rendered. Normal voting remains asynchronous; excessive write requests receive HTTP 429.

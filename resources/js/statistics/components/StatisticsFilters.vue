@@ -35,14 +35,7 @@ const emit = defineEmits([
 ]);
 
 const currentYear = new Date().getFullYear();
-
-function dateValue(year) {
-    return year ? `${year}-01-01` : '';
-}
-
-function updateYear(event, eventName) {
-    emit(`update:${eventName}`, event.target.value.slice(0, 4));
-}
+const years = Array.from({ length: currentYear - 1886 + 1 }, (_, index) => String(currentYear - index));
 
 function submit() {
     emit('submit');
@@ -69,28 +62,28 @@ function submit() {
 
             <label class="grid min-w-0 gap-2 text-sm font-semibold text-slate-800">
                 Год от
-                <input
+                <select
                     class="min-w-0 rounded-lg border-slate-300 text-slate-950 shadow-sm focus:border-sky-600 focus:ring-sky-600"
-                    type="date"
-                    min="1886-01-01"
-                    :max="`${currentYear}-12-31`"
-                    :value="dateValue(props.yearFrom)"
+                    :value="props.yearFrom"
                     :disabled="props.isLoadingResults"
-                    @input="updateYear($event, 'yearFrom')"
+                    @change="emit('update:yearFrom', $event.target.value)"
                 >
+                    <option value="">Не указан</option>
+                    <option v-for="year in years" :key="year" :value="year">{{ year }}</option>
+                </select>
             </label>
 
             <label class="grid min-w-0 gap-2 text-sm font-semibold text-slate-800">
                 Год до
-                <input
+                <select
                     class="min-w-0 rounded-lg border-slate-300 text-slate-950 shadow-sm focus:border-sky-600 focus:ring-sky-600"
-                    type="date"
-                    min="1886-01-01"
-                    :max="`${currentYear}-12-31`"
-                    :value="dateValue(props.yearTo)"
+                    :value="props.yearTo"
                     :disabled="props.isLoadingResults"
-                    @input="updateYear($event, 'yearTo')"
+                    @change="emit('update:yearTo', $event.target.value)"
                 >
+                    <option value="">Не указан</option>
+                    <option v-for="year in years" :key="year" :value="year">{{ year }}</option>
+                </select>
             </label>
         </div>
 

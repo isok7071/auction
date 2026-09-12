@@ -14,6 +14,7 @@ Route::get('/voting/pair', [VotingPairController::class, 'show'])
     ->block(10, 10);
 Route::post('/voting/votes', [VoteController::class, 'store'])
     ->name('voting.votes')
+    ->middleware('throttle:voting')
     ->block(10, 10);
 Route::view('/statistics', 'statistics.index')->name('statistics.page');
 Route::get('/statistics/models', [StatisticsController::class, 'models'])->name('statistics.models');

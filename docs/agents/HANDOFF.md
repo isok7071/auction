@@ -1,126 +1,59 @@
 # Handoff
 
-`AGENTS.md` is the operating manual. This file is the live stage pointer, including which implementation plan to follow. Do not rely on chat history.
+`AGENTS.md` is the operating manual. This file describes only the live delivery state.
 
 ## Current Stage
 
-**Harness and Docker are complete.** Laravel 13 is bootstrapped. MCP, skills, handoff files, and Docker Compose runtime files are in the repo.
+Backend and frontend implementation are complete in the working tree. The voting page at `/` uses jQuery/AJAX and responsive ezPlus Tints; the statistics page at `/statistics` uses Vue 3 Composition API with single-file components, a composable, a separate API module, and server-side pagination.
 
-The next vendor starts **Task 3: Data Model And Import**. Product voting/statistics features wait until the data model and import are implemented.
+Automated verification, production asset compilation, database migration, full source import, HTTP smoke, and interactive browser smoke passed.
 
-## Next Step
+## Next Allowed Step
 
-1. Read `docs/agents/TOOLING.md` for the MCP and skills inventory.
-2. Follow `docs/superpowers/plans/2026-09-11-fordewind-implementation.md` from **Task 3**.
-3. Implement migrations, Eloquent models/factories, database-backed sessions if needed, and the idempotent import path.
-4. Use the Docker MySQL settings from `.env.example`; do not treat the old local SQLite `.env` as the delivery runtime.
-5. Record commands, verification, and decisions in `docs/agents/DECISIONS.md` and `docs/agents/AI_WORKFLOW.md`.
+1. Keep the working tree for developer review or create a commit only after explicit developer approval.
+2. Restart `node` for Vite HMR when needed; stop it and remove generated `public/hot` for production-asset browser smoke.
 
-Do not reinstall host PHP with `php.new`. Do not treat earlier design notes that mentioned PHP 8.4 as a lock.
+## Implemented Contracts
 
-## Scope Completed In This Stage
+- Pages: `GET /` (`voting.page`), `GET /statistics` (`statistics.page`).
+- Voting JSON: `GET /voting/models`, `GET /voting/pair`, `POST /voting/votes`.
+- Statistics JSON: `GET /statistics/models`, `GET /statistics/data`.
+- Voting frontend: `resources/js/voting.js` owns jQuery state, AJAX, CSRF, pair rendering, and ezPlus initialization.
+- Statistics frontend: `resources/js/statistics.js` mounts `StatisticsApp.vue`; `api/statisticsApi.js`, `composables/useStatistics.js`, and focused SFC components own their respective concerns.
 
-- Laravel skeleton merged into the existing project root without deleting `Task.md` or `.agents`.
-- Laravel Boost installed and merged into `AGENTS.md`.
-- Vendor-agnostic skills, MCP templates, decisions, workflow log, checklist, spec, plan, and this handoff file.
-- Superpowers, Fordewind, and Boost skills vendored into `.agents/skills` and linked from `.codex/skills`.
-- README in Russian for people; agent files in English.
-- Docker Compose added with `app` PHP-FPM, `nginx`, `mysql`, and profiled `node` service for Vite/npm commands.
-- Docker uses PHP 8.5 Alpine, nginx 1.30 Alpine, MySQL 8.4 LTS, and Node 24 LTS Debian slim.
-- `.env.example` is the shared Laravel/Vite environment source and points at Docker MySQL.
-- nginx serves built Vite assets; the profiled node service exposes direct Vite HMR/WebSocket access.
+## Verification Evidence
 
-## Read First
-
-Agents already have `AGENTS.md` for how to work. This file is the live stage, including the current implementation plan.
-
-How to work:
-
-1. `AGENTS.md`
-2. `docs/agents/TOOLING.md`
-3. `docs/agents/DECISIONS.md`
-4. `docs/agents/AI_WORKFLOW.md`
-
-Current work (not operating rules):
-
-5. `Task.md`
-6. `docs/superpowers/specs/2026-09-11-fordewind-laravel-design.md`
-7. `docs/superpowers/plans/2026-09-11-fordewind-implementation.md` from Task 3
-8. `docs/agents/FEATURE_CHECKLIST.md`
-
-## Files Changed In Bootstrap And Harness
-
-Created or substantially written:
-
-- Laravel 13 application scaffold in the project root.
-- `docker-compose.yml`, `docker/php/Dockerfile`, `docker/php/php.ini`, `docker/nginx/default.conf`, `.dockerignore`.
-- `AGENTS.md`, `CLAUDE.md`, `boost.json`, `README.md`.
-- `docs/agents/*` including `TOOLING.md`.
-- `docs/superpowers/specs/2026-09-11-fordewind-laravel-design.md`
-- `docs/superpowers/plans/2026-09-11-fordewind-implementation.md`
-- `.mcp.json.example`, `.codex/config.toml`, `opencode.json.example`.
-- `.agents/skills/*` including Boost, Fordewind, and Superpowers skills. Codex links live in `.codex/skills`.
-
-Preserved:
-
-- `Task.md`
-- `.agents/plans/fordewind-laravel-design.md`
-- `.agents/templates/*`
-- `.agents/skills/fordewind-laravel/SKILL.md`
-- `.agents/skills/fordewind-harness/SKILL.md`
-
-Local / not source-of-truth:
-
-- `.env` - generated locally, gitignored, currently SQLite defaults.
-- `.mcp.json` and `.cursor/mcp.json` - local Cursor MCP copies, gitignored.
-- `.cursor/` - vendor-local.
-- `.agents/mcp/cursor-memory/project.jsonl` - memory graph, gitignored.
-
-Committed Codex MCP config is `.codex/config.toml`. Recreate Cursor MCP with `cp .mcp.json.example .mcp.json`.
-
-## Commands Run
-
-See `docs/agents/AI_WORKFLOW.md` for full evidence. Summary:
-
-- `composer create-project laravel/laravel .laravel-bootstrap --no-interaction`
-- `composer require laravel/boost --dev --no-interaction`
-- `php artisan boost:install --no-interaction`
-- `npm install --ignore-scripts`
-- `npm run build`
-- `php artisan test --compact`
-- `docker compose config`
-- `docker compose build app`
-- `docker compose run --rm --no-deps app php artisan about`
-
-## Verification
-
-| Check | Result |
-| --- | --- |
-| Laravel boots | `php artisan about` → Laravel 13.31.0, env `local` |
-| Composer metadata | `composer validate --strict` passed |
-| Default tests | `php artisan test --compact` → 2 passed |
-| Vite scaffold build | `npm run build` passed with full network |
-| Docker config | `docker compose config` passed |
-| Docker app image | `docker compose build app` → `fordewind-app:php-8.5`, about 138 MB |
-| Docker Laravel smoke | `php artisan about` in app container → Laravel 13.31.0, PHP 8.5.10, DB `mysql` |
-| Vite HMR | `/@vite/client` → HTTP 200; WebSocket with `vite-hmr` protocol opened |
-| nginx assets | nginx 1.30.4; `/build/manifest.json` → HTTP 200 with immutable cache header |
-| Git | Initialized on `main`, with no commits. Do not create commits unless the developer asks. |
+- Focused frontend/statistics feature suite after pagination: 10 passed, 49 assertions.
+- Complete project suite after final UI, rate-limit, and documentation fixes: 36 passed, 157 assertions.
+- Vite 8 production build with Vue plugin: passed and emitted separate voting/statistics bundles.
+- Pint dirty formatting: passed at the final gate.
+- MySQL migration: nothing pending.
+- Full local import: command reported 1,497 created cars and 1,497 copied photos; idempotency is covered by the import feature test.
+- HTTP smoke: `/`, `/statistics`, `/statistics/models`, and `/statistics/data` returned 200.
+- Browser MCP still expects a system Chrome executable, but final visual smoke passed through a temporary Playwright Chromium runtime without changing project dependencies.
+- Browser voting smoke: model selection, pair rendering, ezPlus initialization, vote submission, next pair, and no page reload passed.
+- Browser statistics smoke: native model selector with all 74 imported models, model/year filter, client validation, 24 results per page, next-page loading without navigation, mobile cards, and no horizontal overflow passed.
+- Responsive voting regression test: the server-rendered card grid switches to two columns at `lg`; below that breakpoint jQuery selects a contained ezPlus lens.
+- Final Playwright voting smoke: at 911px and 390px, including active hover on the ezPlus overlay, `body.scrollWidth` and `documentElement.scrollWidth` equalled the viewport. The cards remained one column and the lens was visible.
+- Final Playwright statistics smoke: 74 model options, 142 values in each year-only selector, and 24 rendered table rows; page width equalled the 1280px viewport.
+- Blade-cache permission recovery: root-owned compiled views caused `touch(): Utime failed`; clearing and recompiling as `www-data` restored both pages to HTTP 200. The README records the recovery command and runs PHPUnit as `www-data`.
+- Vote rate-limit regression test: 31st request from the same IP receives HTTP 429 after 30 requests per minute.
+- Composer audit: no security vulnerability advisories found.
 
 ## Risks And Constraints
 
-- Host PHP is 8.3.17 and cannot run the project dependencies after the delivery constraint changed to `php: ^8.5`; use the app container.
-- Docker versions chosen in D017: PHP 8.5 FPM Alpine, MySQL 8.4 LTS, nginx 1.30 Alpine, Node 24 LTS Debian slim.
-- Host PHP has no SQLite driver. Runtime database is Docker MySQL.
-- Local `.env` may still contain bootstrap SQLite values. Copy `.env.example` for Docker runtime setup.
-- `php.new` was rejected by the developer.
-- Do not mix jQuery and Vue in one functional area.
-- Do not read `env()` outside config files.
-- Human-facing README and product spec stay Russian. Agent harness files stay English.
-- Git has no commits yet.
+- Browser MCP itself requires a system Chrome executable. A temporary Playwright Chromium runtime is sufficient for local headless smoke when Chrome is unavailable.
+- Host PHP does not match the project runtime; use the PHP 8.5 Docker app container.
+- Runtime database is Docker MySQL. Do not run `migrate:fresh`, seeders, or other destructive database commands.
+- Source data under `storage/app/import-source`, generated public images, `.env`, credentials, and tokens must remain untracked.
+- Keep voting jQuery-only and statistics Vue-only.
 
-## Developer Review Notes
+## Read First
 
-- Do not reinstall PHP. Use the existing PHP/Composer toolchain.
-- Harness and Docker are done. The next vendor implements import/data model, then backend and frontends.
-- Fill every detail needed for a vendor switch into project files, not chat memory.
+1. `AGENTS.md`
+2. `docs/agents/TOOLING.md`
+3. `Task.md`
+4. `.agents/plans/fordewind-laravel-design.md` at Task 10
+5. `docs/agents/DECISIONS.md`
+6. `docs/agents/AI_WORKFLOW.md`
+7. `docs/agents/FEATURE_CHECKLIST.md`
