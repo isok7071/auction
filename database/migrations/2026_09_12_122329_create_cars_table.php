@@ -20,7 +20,6 @@ return new class extends Migration
             $table->string('engine')->nullable();
             $table->string('transmission')->nullable();
             $table->string('color')->nullable();
-            $table->json('source_payload');
             $table->timestamps();
 
             $table->index(['make', 'model', 'year']);
@@ -31,4 +30,5 @@ return new class extends Migration
     {
         Schema::dropIfExists('cars');
     }
+
 };

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories;
 
 use App\Domain\Cars\Models\Car;
@@ -11,13 +13,13 @@ final class CarPhotoFactory extends Factory
 {
     public function definition(): array
     {
-        $filename = fake()->unique()->sha256().'.jpg';
+        $filename = fake()->unique()->sha256() . '.jpg';
 
         return [
-            'car_id' => Car::factory(),
-            'source_filename' => $filename,
-            'storage_path' => 'cars/'.$filename,
-            'checksum' => hash('sha256', $filename),
+            CarPhoto::FIELD_CAR_ID          => Car::factory(),
+            CarPhoto::FIELD_SOURCE_FILENAME => $filename,
+            CarPhoto::FIELD_STORAGE_PATH    => 'cars/' . $filename,
+            CarPhoto::FIELD_CHECKSUM        => hash('sha256', $filename),
         ];
     }
 }

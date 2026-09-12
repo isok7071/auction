@@ -1,8 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories;
 
-use App\Domain\Cars\Models\Car;
 use App\Domain\Cars\Models\CarPhoto;
 use App\Domain\Voting\Models\Vote;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -12,15 +13,16 @@ final class VoteFactory extends Factory
 {
     public function definition(): array
     {
-        $winnerCar = Car::factory();
-        $loserCar = Car::factory();
-
         return [
-            'session_id' => fake()->uuid(),
-            'winner_photo_id' => CarPhoto::factory()->for($winnerCar),
-            'loser_photo_id' => CarPhoto::factory()->for($loserCar),
-            'winner_car_id' => $winnerCar,
-            'loser_car_id' => $loserCar,
+            Vote::FIELD_SESSION_ID      => fake()->uuid(),
+            Vote::FIELD_WINNER_PHOTO_ID => CarPhoto::factory(),
+            Vote::FIELD_LOSER_PHOTO_ID  => CarPhoto::factory(),
+            Vote::FIELD_WINNER_CAR_ID   => static fn(array $attributes): int => (int) CarPhoto::query()
+                ->findOrFail($attributes[Vote::FIELD_WINNER_PHOTO_ID])
+                ->getAttribute(CarPhoto::FIELD_CAR_ID),
+            Vote::FIELD_LOSER_CAR_ID    => static fn(array $attributes): int => (int) CarPhoto::query()
+                ->findOrFail($attributes[Vote::FIELD_LOSER_PHOTO_ID])
+                ->getAttribute(CarPhoto::FIELD_CAR_ID),
         ];
     }
 }

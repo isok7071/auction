@@ -16,9 +16,6 @@ return new class extends Migration
             $table->foreignId('winner_car_id')->constrained('cars');
             $table->foreignId('loser_car_id')->constrained('cars');
             $table->timestamps();
-
-            $table->index('winner_car_id');
-            $table->index('loser_car_id');
         });
     }
 
@@ -26,4 +23,5 @@ return new class extends Migration
     {
         Schema::dropIfExists('votes');
     }
+
 };
