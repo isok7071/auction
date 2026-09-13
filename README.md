@@ -18,8 +18,11 @@ Laravel-приложение для попарного голосования з
   ```
   Корневой [.env](.env.example) используют Laravel и Vite. Значения MySQL по умолчанию: база `fordewind`, пользователь `fordewind`, пароль `fordewind`.
 2. Соберите PHP-образ и установите зависимости. 
-  ```bash
+   ```bash
    docker compose build app
+
+   # Подготовить named volumes для запуска Composer от имени пользователя хоста.
+   docker compose run --rm --no-deps app true
 
    docker compose run --rm --no-deps --user "$(id -u):$(id -g)" app composer install
 

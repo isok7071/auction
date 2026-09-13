@@ -43,6 +43,7 @@ Automated verification, production asset compilation, database migration, full s
 - Composer audit: no security vulnerability advisories found.
 - Current review follow-up: focused PHP suite passed (30 tests, 126 assertions); Vite production build passed after the voting lifecycle change.
 - Test review follow-up: full PHPUnit suite passed with 36 tests and 158 assertions; skeleton tests and a source-level CSS assertion were removed.
+- Clean Docker-install recovery: after preparing fresh named volumes with `docker compose run --rm --no-deps app true`, `composer install` under the host UID completed `package:discover` successfully.
 
 ## Risks And Constraints
 
