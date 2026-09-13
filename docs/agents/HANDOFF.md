@@ -6,6 +6,8 @@
 
 Backend and frontend implementation are complete in the working tree. The voting page at `/` uses jQuery/AJAX and responsive ezPlus Tints; the statistics page at `/statistics` uses Vue 3 Composition API with single-file components, a composable, a separate API module, and server-side pagination.
 
+The current uncommitted review follow-up centralizes the PHP model key, names the statistics year pattern, prevents voting before both photos load, and documents deferred index work in README.
+
 Automated verification, production asset compilation, database migration, full source import, HTTP smoke, and interactive browser smoke passed.
 
 ## Next Allowed Step
@@ -39,6 +41,8 @@ Automated verification, production asset compilation, database migration, full s
 - Blade-cache permission recovery: root-owned compiled views caused `touch(): Utime failed`; clearing and recompiling as `www-data` restored both pages to HTTP 200. The README records the recovery command and runs PHPUnit as `www-data`.
 - Vote rate-limit regression test: 31st request from the same IP receives HTTP 429 after 30 requests per minute.
 - Composer audit: no security vulnerability advisories found.
+- Current review follow-up: focused PHP suite passed (30 tests, 126 assertions); Vite production build passed after the voting lifecycle change.
+- Test review follow-up: full PHPUnit suite passed with 36 tests and 158 assertions; skeleton tests and a source-level CSS assertion were removed.
 
 ## Risks And Constraints
 

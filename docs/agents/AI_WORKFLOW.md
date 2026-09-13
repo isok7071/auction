@@ -34,6 +34,14 @@ This document records how AI-assisted engineering was used on the Fordewind proj
 - Documentation: README now has ordered clean-clone setup, import, Vite development, production build, checks, and shutdown commands. Stale agent handoff references were corrected.
 - Browser MCP could not use its configured system Chrome in the final environment because installation requires host `sudo`. A temporary Playwright Chromium runtime was installed without changing project dependencies and completed the final visual smoke.
 
+## Current Review Follow-up - 2026-09-13
+
+- `Car::modelKey()` is now the common PHP representation of `make + ' ' + model`; vote validation, pending-pair validation, and the statistics resource use it instead of duplicating the expression.
+- Statistics year validation names its integer-only pattern. The request sequence comment documents why it remains necessary in addition to `AbortController`.
+- Voting waits for both photo `load` events before enabling its buttons. The same request token now invalidates stale AJAX, image, and delayed ezPlus callbacks after a model switch.
+- No schema migration was added. README records generated `model_key` and year indexes as scalability work to validate with query plans if the dataset grows.
+- Test review removed the two Laravel skeleton tests and a CSS-class assertion. HTTP coverage now proves pending-pair reuse in one browser session and verifies both the vote response and persisted photo IDs.
+
 ## MCP And External Tools Used
 
 | Tool | Purpose | Result |
@@ -99,6 +107,9 @@ This document records how AI-assisted engineering was used on the Fordewind proj
 | Tasks 3–5 static verification | `php -l` for changed PHP files; `git diff --check`; secret scan excluding vendored instruction examples and `.env.example` | Passed: every checked PHP file has valid syntax; no diff whitespace errors or project-secret matches. |
 | Tasks 3–5 independent review | `backend_review` read-only code review | No Critical defect; regression coverage and scalar-photo validation finding fixed before handoff. |
 | Model-key scope refactor | `php -l app/Domain/Cars/Models/Car.php app/Infrastructure/Persistence/Eloquent/EloquentVotingRepository.php app/Infrastructure/Persistence/Eloquent/EloquentStatisticsRepository.php`; `git diff --check` | Passed. `Car` now owns MySQL-only `selectModelKey()` and `whereModelKey()` scopes; no SQLite branch remains in this query logic. |
+| Current review follow-up | `docker compose exec -T app php artisan test --compact tests/Unit/Services/VoteServiceTest.php tests/Unit/Services/VotingPairServiceTest.php tests/Unit/Services/StatisticsServiceTest.php tests/Feature/Http/VoteEndpointTest.php tests/Feature/Http/VotingPairEndpointTest.php tests/Feature/Http/StatisticsEndpointTest.php tests/Feature/Database/CarDomainSchemaTest.php` | Passed: 30 tests, 126 assertions. |
+| Current frontend build | `docker compose run --rm node npm run build` | Passed after the jQuery pair lifecycle change; Vite 8.3.0 emitted the production bundles. |
+| Test review follow-up | `docker compose exec -T app php artisan test --compact` | Passed: 36 tests, 158 assertions. |
 | --- | --- | --- |
 | Prerequisite versions | `php -v; composer -V; laravel --version; npm -v; bun -v; git status --short --branch` | PHP 8.3.17, Composer 2.6.2, npm 10.9.8 available; `laravel` and `bun` unavailable; directory was not a git repository. |
 | Laravel agent guidance | Fetch `https://laravel.com/for/agents` | Guidance read before installation. |
