@@ -24,6 +24,7 @@ $(function () {
         right: $('#voting-right-image'),
     };
     let currentPair = null;
+    // Для игнорирования устаревших колбэков сети, изображений и зума после выбора более новой модели.
     let requestToken = 0;
     let state = 'initial';
 
@@ -64,17 +65,17 @@ $(function () {
         });
     };
 
-    const enableZoom = async () => {
+    const enableZoom = async (token) => {
         await ezPlusReady;
 
-        if (typeof $.fn.ezPlus !== 'function') {
+        if (token !== requestToken || typeof $.fn.ezPlus !== 'function') {
             return;
         }
 
         const useContainedLens = window.matchMedia('(max-width: 1023px)').matches;
 
         Object.entries($images).forEach(([side, $image]) => {
-            if (!$image.attr('src')) {
+            if (token !== requestToken || !$image.attr('src')) {
                 return;
             }
 
@@ -101,7 +102,7 @@ $(function () {
         });
     };
 
-    const renderPair = (pair) => {
+    const renderPair = (pair, token) => {
         currentPair = pair;
 
         clearImages();
@@ -109,15 +110,20 @@ $(function () {
         let failedToLoad = false;
 
         const initializeZoomWhenReady = () => {
+            if (token !== requestToken || currentPair !== pair) {
+                return;
+            }
+
             loadedImages += 1;
 
             if (loadedImages === Object.keys($images).length) {
-                enableZoom();
+                enableZoom(token);
+                setState('ready', 'Выберите фотографию, которая нравится больше.');
             }
         };
 
         const showPhotoLoadingError = () => {
-            if (failedToLoad) {
+            if (token !== requestToken || currentPair !== pair || failedToLoad) {
                 return;
             }
 
@@ -138,8 +144,6 @@ $(function () {
                 .attr('alt', `${pair.model}: ${side === 'left' ? 'левая' : 'правая'} фотография`)
                 .prop('hidden', false);
         }
-
-        setState('ready', 'Выберите фотографию, которая нравится больше.');
     };
 
     const loadPair = () => {
@@ -169,7 +173,7 @@ $(function () {
                     return;
                 }
 
-                renderPair(response.data);
+                renderPair(response.data, token);
             })
             .fail((response) => {
                 if (token !== requestToken || model !== $model.val()) {

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Голосование — Fordewind')
+@section('title', 'Голосование')
 
 @section('assets')
     @vite(['resources/css/app.css', 'resources/js/voting.js'])

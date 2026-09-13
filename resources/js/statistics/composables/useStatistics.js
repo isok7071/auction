@@ -1,6 +1,8 @@
 import { onBeforeUnmount, reactive, ref } from 'vue';
 import { fetchStatistics, fetchStatisticsModels } from '../api/statisticsApi';
 
+const YEAR_PATTERN = /^\d+$/;
+
 export function useStatistics({ statisticsApi, modelsApi }) {
     const models = ref([]);
     const cars = ref([]);
@@ -21,19 +23,20 @@ export function useStatistics({ statisticsApi, modelsApi }) {
     const error = ref('');
     const hasLoaded = ref(false);
     let resultsController = null;
+    // Запрос может завершиться во время отмены, поэтому обновлять реактивное состояние может только последний.
     let requestSequence = 0;
 
     function validateFilters() {
         const { yearFrom, yearTo } = filters;
 
-        if ((yearFrom && !/^\d+$/.test(yearFrom)) || (yearTo && !/^\d+$/.test(yearTo))) {
+        if ((yearFrom && !YEAR_PATTERN.test(yearFrom)) || (yearTo && !YEAR_PATTERN.test(yearTo))) {
             error.value = 'Год выпуска должен быть целым числом.';
 
             return false;
         }
 
         if (yearFrom && yearTo && Number(yearFrom) > Number(yearTo)) {
-            error.value = 'Год «от» не может быть больше года «до».';
+            error.value = 'Год "от" не может быть больше года "до".';
 
             return false;
         }

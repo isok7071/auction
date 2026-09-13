@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Domain\Cars\Models\Car;
 use App\Domain\Cars\Models\CarPhoto;
 use App\Domain\Voting\Contracts\VoteRepository;
 use App\Domain\Voting\Data\RecordVoteDto;
@@ -63,11 +62,8 @@ final class VoteService
 
         foreach ($photos as $photo) {
             $car = $photo->car;
-            $photoModelKey = trim(
-                $car->getAttribute(Car::FIELD_MAKE) . ' ' . $car->getAttribute(Car::FIELD_MODEL),
-            );
 
-            if ($photoModelKey !== $modelKey) {
+            if ($car->modelKey() !== $modelKey) {
                 throw ValidationException::withMessages([
                     'model' => 'The selected photos do not belong to this model.',
                 ]);

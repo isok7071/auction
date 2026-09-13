@@ -89,6 +89,13 @@ final class Car extends Model
         return $this->hasMany(Vote::class, Vote::FIELD_WINNER_CAR_ID);
     }
 
+    public function modelKey(): string
+    {
+        return trim(
+            $this->getAttribute(self::FIELD_MAKE) . ' ' . $this->getAttribute(self::FIELD_MODEL),
+        );
+    }
+
     public function scopeSelectModelKey(Builder $query): void
     {
         $query->selectRaw($this->modelKeyExpression() . ' AS model_key');
@@ -110,6 +117,7 @@ final class Car extends Model
     private function modelKeyExpression(): string
     {
         $grammar = $this->getConnection()->getQueryGrammar();
+        // Выражение переиспользуется в запросах с JOIN, поэтому оба идентификатора должны быть qualified и в кавычках.
         $make = $this->wrapColumn($grammar, $this->qualifyColumn(self::FIELD_MAKE));
         $model = $this->wrapColumn($grammar, $this->qualifyColumn(self::FIELD_MODEL));
 

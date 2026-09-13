@@ -47,6 +47,16 @@ final class CarDomainSchemaTest extends TestCase
         $this->assertFalse(Schema::hasColumn('cars', 'source_payload'));
     }
 
+    public function test_car_builds_its_model_key_from_make_and_model(): void
+    {
+        $car = Car::factory()->make([
+            Car::FIELD_MAKE  => 'FORD',
+            Car::FIELD_MODEL => 'MUSTANG',
+        ]);
+
+        $this->assertSame('FORD MUSTANG', $car->modelKey());
+    }
+
     public function test_car_photo_exposes_public_storage_url(): void
     {
         Storage::fake('public');

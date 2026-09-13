@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Domain\Cars\Models\Car;
 use App\Domain\Voting\Contracts\VotingRepository;
 use App\Domain\Voting\Data\VotingPairDto;
 use Illuminate\Session\Store;
@@ -118,11 +117,8 @@ final class VotingPairService
     {
         foreach ($photos as $photo) {
             $car = $photo->car;
-            $actualKey = trim(
-                $car->getAttribute(Car::FIELD_MAKE) . ' ' . $car->getAttribute(Car::FIELD_MODEL),
-            );
 
-            if ($actualKey !== $modelKey) {
+            if ($car->modelKey() !== $modelKey) {
                 return false;
             }
         }

@@ -22,7 +22,10 @@ final class VotingPairController extends Controller
             ], 422);
         }
 
-        $pair = $service->pairFor($modelKey, $request->session());
+        $pair = $service->pairFor(
+            $modelKey,
+            $request->session()
+        );
 
         if ($pair === null) {
             return response()->json([

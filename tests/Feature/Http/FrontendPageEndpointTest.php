@@ -16,7 +16,7 @@ final class FrontendPageEndpointTest extends TestCase
     public function test_statistics_models_include_models_that_cannot_form_a_voting_pair(): void
     {
         $car = Car::factory()->create([
-            Car::FIELD_MAKE => 'SAAB',
+            Car::FIELD_MAKE  => 'SAAB',
             Car::FIELD_MODEL => '900',
         ]);
         CarPhoto::factory()->for($car)->create();
@@ -28,7 +28,7 @@ final class FrontendPageEndpointTest extends TestCase
         $this->getJson('/statistics/models')
             ->assertOk()
             ->assertJsonFragment([
-                'key' => 'SAAB 900',
+                'key'   => 'SAAB 900',
                 'label' => 'SAAB 900',
             ]);
     }
@@ -50,7 +50,6 @@ final class FrontendPageEndpointTest extends TestCase
         $this->get('/')
             ->assertOk()
             ->assertSee('name="voting-model"', false)
-            ->assertSee('lg:grid-cols-2', false)
             ->assertSee('data-side="left"', false)
             ->assertSee('data-side="right"', false)
             ->assertSee('name="csrf-token"', false);

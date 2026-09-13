@@ -23,9 +23,7 @@ final class StatisticsCarResource extends JsonResource
             'id'           => (int) $car->getKey(),
             'make'         => (string) $car->getAttribute(Car::FIELD_MAKE),
             'model'        => (string) $car->getAttribute(Car::FIELD_MODEL),
-            'model_label'  => trim(
-                $car->getAttribute(Car::FIELD_MAKE) . ' ' . $car->getAttribute(Car::FIELD_MODEL),
-            ),
+            'model_label'  => $car->modelKey(),
             'year'         => (int) $car->getAttribute(Car::FIELD_YEAR),
             'odometer'     => $car->getAttribute(Car::FIELD_ODOMETER),
             'units'        => $car->getAttribute(Car::FIELD_UNITS),

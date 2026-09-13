@@ -57,6 +57,21 @@ final class VotingPairEndpointTest extends TestCase
         $this->assertStringContainsString('/storage/cars/', $response->json('data.left.url'));
     }
 
+    public function test_pair_endpoint_returns_the_same_pending_pair_for_the_same_session(): void
+    {
+        $car = Car::factory()->create([
+            Car::FIELD_MAKE  => 'FORD',
+            Car::FIELD_MODEL => 'MUSTANG',
+        ]);
+        CarPhoto::factory()->count(3)->for($car)->create();
+
+        $first = $this->getJson('/voting/pair?model=FORD%20MUSTANG')->assertOk();
+        $again = $this->getJson('/voting/pair?model=FORD%20MUSTANG')->assertOk();
+
+        $this->assertSame($first->json('data.left.id'), $again->json('data.left.id'));
+        $this->assertSame($first->json('data.right.id'), $again->json('data.right.id'));
+    }
+
     public function test_pair_endpoint_returns_not_enough_photos_for_a_known_single_photo_model(): void
     {
         $car = Car::factory()->create([
