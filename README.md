@@ -12,11 +12,11 @@ Laravel-приложение для попарного голосования з
 
 Все команды выполняются из корня репозитория в указанном порядке.
 
-1. Создайте локальную конфигурацию из `[.env.example](.env.example)`:
+1. Создайте локальную конфигурацию из [.env.example](.env.example):
   ```bash
    cp .env.example .env
   ```
-  Корневой `[.env](.env.example)` используют Laravel и Vite. Значения MySQL по умолчанию: база `fordewind`, пользователь `fordewind`, пароль `fordewind`.
+  Корневой [.env](.env.example) используют Laravel и Vite. Значения MySQL по умолчанию: база `fordewind`, пользователь `fordewind`, пароль `fordewind`.
 2. Соберите PHP-образ и установите зависимости. 
   ```bash
    docker compose build app
@@ -142,7 +142,7 @@ docs/agents/                   # планы, решения, журнал AI-wor
 - `/` — адаптивное попарное голосование на jQuery/AJAX с увеличением фотографий через ezPlus Tints.
 - `/statistics` — Vue 3 Composition API приложение с фильтрами по модели и диапазону годов, desktop-таблицей и mobile-карточками.
 
-Vue-часть построена из однофайловых компонентов в `[resources/js/statistics](resources/js/statistics)`: запросы находятся в `api`, реактивное состояние — в `composables`, интерфейс — в `components`. Голосование и статистика имеют отдельные Vite entrypoints и не смешивают jQuery с Vue.
+Vue-часть построена из однофайловых компонентов в [resources/js/statistics](resources/js/statistics): запросы находятся в `api`, реактивное состояние — в `composables`, интерфейс — в `components`. Голосование и статистика имеют отдельные Vite entrypoints и не смешивают jQuery с Vue.
 
 ## API
 
@@ -176,28 +176,28 @@ Frontend использует следующие JSON endpoints:
 
 | Файл                                                                                                                             | Что внутри                                                                 |
 | -------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| `[AGENTS.md](AGENTS.md)`                                                                                                         | правила работы агентов, архитектурные ограничения и требования к проверкам |
-| `[Task.md](Task.md)`                                                                                                             | исходное задание, использованное для декомпозиции и подготовки планов      |
-| `[docs/superpowers/specs/2026-09-11-fordewind-laravel-design.md](docs/superpowers/specs/2026-09-11-fordewind-laravel-design.md)` | спецификация продукта и бизнес-логика                                      |
-| `[docs/superpowers/plans/2026-09-11-fordewind-implementation.md](docs/superpowers/plans/2026-09-11-fordewind-implementation.md)` | пошаговый технический план реализации                                      |
-| `[.agents/plans/fordewind-laravel-design.md](.agents/plans/fordewind-laravel-design.md)`                                         | план, подготовленный проектным harness                                     |
-| `[docs/agents/HANDOFF.md](docs/agents/HANDOFF.md)`                                                                               | текущий этап, выполненные задачи, проверки и следующий шаг                 |
-| `[docs/agents/TOOLING.md](docs/agents/TOOLING.md)`                                                                               | доступные инструменты и MCP-серверы                                        |
-| `[docs/agents/DECISIONS.md](docs/agents/DECISIONS.md)`                                                                           | архитектурные и технические решения с обоснованием                         |
-| `[docs/agents/AI_WORKFLOW.md](docs/agents/AI_WORKFLOW.md)`                                                                       | промпты, команды, результаты проверок и ограничения AI-assisted workflow   |
-| `[docs/agents/FEATURE_CHECKLIST.md](docs/agents/FEATURE_CHECKLIST.md)`                                                           | соответствие реализованных функций требованиям                             |
-| `[docs/agents/README.md](docs/agents/README.md)`                                                                                 | назначение каталога и правила ведения агентской документации               |
+| [AGENTS.md](AGENTS.md)                                                                                                         | правила работы агентов, архитектурные ограничения и требования к проверкам |
+| [Task.md](Task.md)                                                                                                             | исходное задание, использованное для декомпозиции и подготовки планов      |
+| [docs/superpowers/specs/2026-09-11-fordewind-laravel-design.md](docs/superpowers/specs/2026-09-11-fordewind-laravel-design.md) | спецификация продукта и бизнес-логика                                      |
+| [docs/superpowers/plans/2026-09-11-fordewind-implementation.md](docs/superpowers/plans/2026-09-11-fordewind-implementation.md) | пошаговый технический план реализации                                      |
+| [.agents/plans/fordewind-laravel-design.md](.agents/plans/fordewind-laravel-design.md)                                         | план, подготовленный проектным harness                                     |
+| [docs/agents/HANDOFF.md](docs/agents/HANDOFF.md)                                                                               | текущий этап, выполненные задачи, проверки и следующий шаг                 |
+| [docs/agents/TOOLING.md](docs/agents/TOOLING.md)                                                                               | доступные инструменты и MCP-серверы                                        |
+| [docs/agents/DECISIONS.md](docs/agents/DECISIONS.md)                                                                           | архитектурные и технические решения с обоснованием                         |
+| [docs/agents/AI_WORKFLOW.md](docs/agents/AI_WORKFLOW.md)                                                                       | промпты, команды, результаты проверок и ограничения AI-assisted workflow   |
+| [docs/agents/FEATURE_CHECKLIST.md](docs/agents/FEATURE_CHECKLIST.md)                                                           | соответствие реализованных функций требованиям                             |
+| [docs/agents/README.md](docs/agents/README.md)                                                                                 | назначение каталога и правила ведения агентской документации               |
 
 
 
 
 ## Использование AI-инструментов
 
-При разработке использовались Cursor и Codex как AI-ассистенты. Артефакты процесса сохранены в `[docs/agents](docs/agents)`, `[.agents/plans](.agents/plans)` и `[docs/superpowers](docs/superpowers)`.
+При разработке использовались Cursor и Codex как AI-ассистенты. Артефакты процесса сохранены в [docs/agents](docs/agents), [.agents/plans](.agents/plans) и [docs/superpowers](docs/superpowers).
 
 Использованные модели: Cursor Grok 4.6, Composer 2.5, GPT-5.6 Luna, GPT-5.6 Terra, GPT-5.6 Sol, GPT-5.5 - в зависимости от задачи.
 
-- Для анализа требований и декомпозиции использовались `[Task.md](Task.md)` (исходное задание в md формате), skills `brainstorming`, `writing-plans` и проектные правила, которые я описал на этапе создания harness в `[AGENTS.md](AGENTS.md)`, а также skills конкретно для этого проекта (`[fordewind-harness](.agents/skills/fordewind-harness)`, `[fordewind-laravel](.agents/skills/fordewind-laravel)` и другие).
+- Для анализа требований и декомпозиции использовались [Task.md](Task.md) (исходное задание в md формате), skills `brainstorming`, `writing-plans` и проектные правила, которые я описал на этапе создания harness в [AGENTS.md](AGENTS.md), а также skills конкретно для этого проекта ([fordewind-harness](.agents/skills/fordewind-harness), [fordewind-laravel](.agents/skills/fordewind-laravel) и другие).
 - Для проверки применялись `test-driven-development`, `systematic-debugging`, `verification-before-completion`, Laravel Boost, Docker PHPUnit, Vite build, MCP Playwright.
 - Каждую подзадачу я выполнял отдельной сессией для того чтобы не смешивать и не терять контекст агента.
 - Код коммитился мной и проходил перед коммитом ручной отсмотр, проверку существующих контрактов и запуск соответствующих команд; итоговые решения по правкам и реализации принимались после этой проверки.
@@ -207,9 +207,9 @@ Frontend использует следующие JSON endpoints:
 ### Краткое резюме workflow:
 
 1. Сначала был подготовлен каркас проекта: harness, skills, ТЗ преобразовано в технический план и декомпозировано на подзадачи. Архитектуру, детали реализации задавал я.
-2. Затем был подготовлен Laravel, Docker Compose, установлен Laravel Boost, совмещен `[AGENTS.md](AGENTS.md)` настроенный в Laravel с написанным мной. Разложил все скиллы и доку для агента по папкам. Docker Compose был написан согласно моим правилам: ngninx способный корректно отдавать статику и поддерживать vite HMR, вынос env переменных и тд, небольшой размер образа и тд.
+2. Затем был подготовлен Laravel, Docker Compose, установлен Laravel Boost, совмещен [AGENTS.md](AGENTS.md) настроенный в Laravel с написанным мной. Разложил все скиллы и доку для агента по папкам. Docker Compose был написан согласно моим правилам: ngninx способный корректно отдавать статику и поддерживать vite HMR, вынос env переменных и тд, небольшой размер образа и тд.
 3. После этого взялся за backend: реализован импорт, серверные сценарии голосования и статистики.
-  - Реализация шла по подзадачам, для того чтобы я мог верно описать требования к бэкэнду, и бизнес логике. Агент сам запускал нужные skills во время работы, так как я заранее это описал в `[AGENTS.md](AGENTS.md)` и связанной агентской доке. 
+  - Реализация шла по подзадачам, для того чтобы я мог верно описать требования к бэкэнду, и бизнес логике. Агент сам запускал нужные skills во время работы, так как я заранее это описал в [AGENTS.md](AGENTS.md) и связанной агентской доке. 
   - Код писался на основе тестов, что позволяло приходить к предсказуемым результатам, также было обозначано что агенту при окончании задачи нужно запускать суб-агентов для финального ревью. 
   - Далее каждая задача проходила мое ручное ревью, где я по пунктам обозначал правки которые нужно сделать, выполнял тесты и команды, отсматривал функционал сначала через api эндпоинты, в БД, и в UI.
 4. На следующем этапе frontend разделён на jQuery-область голосования и Vue 3 Composition API статистики. Добавлены серверная пагинация, selector моделей и годов, адаптивный ezPlus, обработка ошибок загрузки фото, rate limit голосов.
