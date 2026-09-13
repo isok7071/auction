@@ -55,7 +55,7 @@ Laravel-приложение для попарного голосования з
   ```bash
    docker compose exec app php artisan cars:import storage/app/import-source
   ```
-3. На странице http://localhost:8080/` появятся данные. 
+3. На странице http://localhost:8080/ появятся данные. 
 
 Команда импортирует автомобили и копирует фотографии в public storage (`cars/{Image}`). Её можно безопасно запускать повторно: записи обновляются по `AuctionItemId`, фотографии — по имени исходного файла, без дубликатов. `storage/app/import-source` не коммитится.
 
