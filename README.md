@@ -39,8 +39,10 @@ Laravel-приложение для попарного голосования з
    docker compose exec app php artisan migrate
    docker compose exec app php artisan storage:link
   ```
-
-
+6. Собрать Frontend в режиме prod сборки
+  ```bash
+    docker compose --profile assets run --rm --user "$(id -u):$(id -g)" node npm run build
+  ```
 
 ## Импорт данных
 
